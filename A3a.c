@@ -3,8 +3,9 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdio.h>
+#include <unistd.h>
 
-#define n 5
+int n=5;
 #define THINKING 1
 #define EATING 0
 #define left (np+4)%n
@@ -41,9 +42,9 @@ void check(int np){
 void take_fork(int np){
     sem_wait(&mutex);
     state[np]=EATING;
-    check(np); // check if forks are available, then eat
+    check(np); 
     sem_post(&mutex);
-    sem_wait(&Sem[np]); //unable to eat, hence signalled to wait
+    sem_wait(&Sem[np]); 
 }
 
 void put_fork(int np){
@@ -51,7 +52,7 @@ void put_fork(int np){
     state[np]=THINKING;
     printf("Philosopher %d puts down fork %d\n",np,right+1);
     printf("Philosopher %d puts down fork %d\n",np,left+1);
-    printf("Philosopher %d THINKING\n",np);
+    printf("Philosopher %d done EATING\n",np+1);
     check(left);
     check(right);
     sem_post(&mutex);
@@ -70,12 +71,12 @@ void *philosopher(void* num){
 int main() {
     int i;
     pthread_t threads[n];
-    sem_init(&mutex,0,1); // initialise semaphores
+    sem_init(&mutex,0,1); 
     for(i=0;i<n;i++){
-        sem_init(&Sem[i],0,1); //creating philosophers processes
+        sem_init(&Sem[i],0,1); 
     }
     for(i=0;i<n;i++){
-        pthread_create(&threads[i],NULL,philosopher,&p[i]);
+        pthread_create(&threads[i],NULL,&philosopher,&p[i]);
         printf("Philosopher %d THINKING\n",i+1);
     }
     for(i=0;i<n;i++){
